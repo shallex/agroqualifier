@@ -8,7 +8,18 @@ import wandb
 
 
 class Trainer:
-    def __init__(self, model, params, train_loader, val_loader, criterion, optimizer, scheduler=None, device: str = "cuda", wandb_logging=False):
+    def __init__(
+        self,
+        model,
+        params,
+        train_loader,
+        val_loader,
+        criterion,
+        optimizer,
+        scheduler=None,
+        device: str = "cuda",
+        wandb_logging=False,
+    ):
         self.model = model.to(device)
         self.params = params
         self.train_loader = train_loader
@@ -25,9 +36,11 @@ class Trainer:
                 config={
                     "learning_rate": self.params.training_params.l_rate,
                     "architecture": self.params.model_params.architecture,
-                    "dataset": (f"Use original_light, " if self.params.dataset_params.original_light else  "") + (f"Use IR_lamp_light" if self.params.dataset_params.IR_lamp_light else  ""),
+                    "dataset": (f"Use original_light, " if self.params.dataset_params.original_light else "")
+                    + (f"Use IR_lamp_light" if self.params.dataset_params.IR_lamp_light else ""),
                     "epochs": self.params.training_params.num_epochs,
-                })
+                },
+            )
 
     def train(self):
         for epoch in range(self.params.training_params.num_epochs):
@@ -41,7 +54,7 @@ class Trainer:
                 loss.backward()
                 self.optimizer.step()
                 running_loss += loss.item()
-            
+
             # Print average training loss for the epoch
             training_loss = running_loss / len(self.train_loader)
             print(f"Epoch {epoch+1}/{self.params.training_params.num_epochs}, Training Loss: {training_loss}")
