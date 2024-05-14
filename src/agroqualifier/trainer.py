@@ -74,7 +74,7 @@ class Trainer:
         val_loss = 0.0
         with torch.no_grad():
             for inputs, labels in tqdm.tqdm(self.val_loader, desc="Validation loop"):
-                inputs, labels = inputs.to(self.device), labels.to(self.device)
+                inputs, labels = inputs.to(self.device).float(), labels.to(self.device)
                 outputs = self.model(inputs)
                 val_loss += self.criterion(outputs, labels).item()
 
