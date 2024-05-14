@@ -5,6 +5,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 from PIL import Image
 
+
 class MandarinDataset(Dataset):
     def __init__(
         self, data_dir: Path, original_light: bool, IR_lamp_light: bool, train: bool, size=(300, 300), transform=None
@@ -77,17 +78,3 @@ class MandarinDataset(Dataset):
             image = self.transform(image)
 
         return image, torch.Tensor([is_damaged]).to(dtype=torch.int)
-
-
-def get_loader(
-        data_dir: Path,
-        original_light: bool,
-        IR_lamp_light: bool,
-        train: bool,
-        size=(300, 300),
-        transform=None,
-        batch_size=16,
-    ):
-    """Get dataloader for MandarinDataset."""
-    dataset = MandarinDataset(data_dir, original_light, IR_lamp_light, train, size, transform)
-    return torch.utils.data.DataLoader(dataset, batch_size=batch_size, shuffle=True)

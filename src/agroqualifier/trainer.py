@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torchvision
 from torchvision import transforms, datasets
+import tqdm
 
 import wandb
 
@@ -46,8 +47,8 @@ class Trainer:
         for epoch in range(self.params.training_params.num_epochs):
             self.model.train()
             running_loss = 0.0
-            for inputs, labels in self.train_loader:
-                inputs, labels = inputs.to(self.device), labels.to(self.device)
+            for inputs, labels in tqdm.tqdm(self.train_loader, desc=f"Train loop, Epoch {epoch + 1}"):
+                inputs, labels = inputs.to(self.device).float(), labels.to(self.device)
                 self.optimizer.zero_grad()
                 outputs = self.model(inputs)
                 loss = self.criterion(outputs, labels)
@@ -58,7 +59,7 @@ class Trainer:
             # Print average training loss for the epoch
             training_loss = running_loss / len(self.train_loader)
             print(f"Epoch {epoch+1}/{self.params.training_params.num_epochs}, Training Loss: {training_loss}")
-            wandb.log({"Train/loss": training_loss})
+            wandb.log({"Train/loss": training_loss, "Learning rate": self.get_lr()})
 
             if self.scheduler is not None:
                 self.scheduler.step()
@@ -72,7 +73,7 @@ class Trainer:
         total = 0
         val_loss = 0.0
         with torch.no_grad():
-            for inputs, labels in self.val_loader:
+            for inputs, labels in tqdm.tqdm(self.val_loader, desc="Validation loop"):
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
                 outputs = self.model(inputs)
                 val_loss += self.criterion(outputs, labels).item()
@@ -85,3 +86,7 @@ class Trainer:
         val_loss = val_loss / len(self.val_loader)
         wandb.log({"Validation/loss": val_loss, "Validation/accuracy": accuracy})
         print(f"Validation Accuracy: {accuracy}, Validation loss: {val_loss}")
+
+    def get_lr(self):
+        for param_group in self.optimizer.param_groups:
+            return param_group['lr']
