@@ -1,5 +1,6 @@
 from torch.utils.data import DataLoader, random_split
 import torch
+from torch.optim.lr_scheduler import StepLR
 
 from agroqualifier.models import SimpleCNN
 from agroqualifier.dataset import MandarinDataset
