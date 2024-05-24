@@ -1,5 +1,6 @@
 from pathlib import Path
 from dataclasses import dataclass
+from torch import nn
 
 from torchvision import transforms
 
@@ -52,3 +53,35 @@ class Exp_1(Params):
     def __init__(self):
         super().__init__()
         self.dataset_params.train_transforms = None
+
+
+class Vadim_Exp_1_time_pred(Params):
+  def __init__(self):
+    super().__init__()
+    self.problem_type = "time_prediction"
+    self.dataset_params.train_transforms = None
+    self.training_params.criterion = nn.MSELoss()
+    self.model_params.output_channels = 1
+    self.training_params.num_epochs = 5
+  
+class Vadim_Exp_2_time_pred(Params):
+  def __init__(self):
+    super().__init__()
+    self.problem_type = "time_prediction"
+    self.dataset_params.size = (232, 232)
+    self.training_params.criterion = nn.MSELoss()
+    self.model_params.architecture = "ResNet101_2_L"
+    self.training_params.num_epochs = 20
+    self.training_params.train_batch_size = 64
+    self.model_params.output_channels = 1
+
+class Vadim_Exp_3_time_pred(Params):
+  def __init__(self):
+    super().__init__()
+    self.problem_type = "time_prediction"
+    self.dataset_params.size = (232, 232)
+    self.training_params.criterion = nn.MSELoss()
+    self.model_params.architecture = "ResNet101_3_L"
+    self.training_params.num_epochs = 30
+    self.training_params.train_batch_size = 64
+    self.model_params.output_channels = 1

@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torchvision.models import resnet101
 
 
 class SimpleCNN(nn.Module):
@@ -20,3 +21,40 @@ class SimpleCNN(nn.Module):
         x = F.relu(self.fc1(x))
         x = self.fc2(x)
         return x
+
+
+class ResNet101_3_L(nn.Module):
+    def __init__(self, params):
+        super(ResNet101_3_L, self).__init__()
+        self.resnet = resnet101(pretrained=True)
+        num_ftrs = self.resnet.fc.in_features
+        self.resnet.fc = torch.nn.Sequential(
+            torch.nn.Linear(num_ftrs, 512),
+            torch.nn.ReLU(),
+            torch.nn.BatchNorm1d(512),
+            torch.nn.Dropout(0.3),
+            torch.nn.Linear(512, 256),
+            torch.nn.ReLU(),
+            torch.nn.BatchNorm1d(256),
+            torch.nn.Dropout(0.3),
+            torch.nn.Linear(256, params.model_params.output_channels),
+            torch.nn.ReLU()
+        )
+    def forward(self, x):
+        return self.resnet(x)
+
+class ResNet101_2_L(nn.Module):
+    def __init__(self, params):
+        super(ResNet101_2_L, self).__init__()
+        self.resnet = resnet101(pretrained=True)
+        num_ftrs = self.resnet.fc.in_features
+        self.resnet.fc = torch.nn.Sequential(
+            torch.nn.Linear(num_ftrs, 256),
+            torch.nn.ReLU(),
+            torch.nn.BatchNorm1d(256),
+            torch.nn.Dropout(0.3),
+            torch.nn.Linear(256, params.model_params.output_channels),
+        torch.nn.ReLU()
+        )
+    def forward(self, x):
+        return self.resnet(x)
