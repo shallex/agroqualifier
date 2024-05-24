@@ -6,7 +6,7 @@ import torch.nn.functional as F
 class VGG16(nn.Module):
     def __init__(self):
         super(VGG16, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=64, kernel_size=3, padding=1)
+        self.conv1 = nn.Conv2d(in_channels=params.model_params.input_channels, out_channels=64, kernel_size=3, padding=1)
         self.conv2 = nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1)
 
         self.conv3 = nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1)
