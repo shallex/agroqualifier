@@ -2,10 +2,10 @@ from torch.utils.data import DataLoader, random_split
 import torch
 from torch.optim.lr_scheduler import StepLR
 
-from agroqualifier.models import SimpleCNN
+from agroqualifier.models import VGG16
 from agroqualifier.dataset import MandarinDataset
 
-models_dict = {"SimpleCNN": SimpleCNN}
+models_dict = {"VGG16": VGG16}
 
 optimizer_dict = {"Adam": torch.optim.Adam}
 
