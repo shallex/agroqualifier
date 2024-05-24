@@ -30,7 +30,7 @@ class TrainingParams:
 
 @dataclass
 class ModelParams:
-    architecture = "SimpleCNN"
+    architecture = "VGG16"
 
 
 @dataclass
