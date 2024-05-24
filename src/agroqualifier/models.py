@@ -28,7 +28,7 @@ class VGG16_NET(nn.Module):
 
         self.fc14 = nn.Linear(25088, 4096)
         self.fc15 = nn.Linear(4096, 4096)
-        self.fc16 = nn.Linear(4096, 10)
+        self.fc16 = nn.Linear(4096, 2)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
