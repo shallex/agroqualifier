@@ -101,7 +101,7 @@ def train(config, confif_dict, config_name, debug=False):
     
     trainer = L.Trainer(
         max_epochs=config.training.num_epochs,
-        deterministic=True,
+        # deterministic=True,
         accelerator="gpu" if torch.cuda.is_available() else "cpu",
         log_every_n_steps=log_every_n_steps,
         callbacks=callbacks,
