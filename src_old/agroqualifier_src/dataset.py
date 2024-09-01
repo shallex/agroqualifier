@@ -77,4 +77,4 @@ class MandarinDataset(Dataset):
         if self.transform and self.train:
             image = self.transform(image)
 
-        return image, torch.Tensor([is_damaged]).to(dtype=torch.int)
+        return image, torch.as_tensor(is_damaged).long()

@@ -4,6 +4,7 @@ import torch.optim as optim
 import torchvision
 from torchvision import transforms, datasets
 import tqdm
+import random
 
 import wandb
 
@@ -29,6 +30,7 @@ class Trainer:
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.device = device
+        self.wandb_logging = wandb_logging
 
         if wandb_logging:
             wandb.init(
@@ -42,11 +44,26 @@ class Trainer:
                     "epochs": self.params.training_params.num_epochs,
                 },
             )
+    
+    def set_global_seed(self, seed: int) -> None:
+        """
+        Set global seed for reproducibility.
+        """
+
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.benchmark = True
+        torch.backends.cudnn.deterministic = True
 
     def train(self):
+        self.set_global_seed(42)
         for epoch in range(self.params.training_params.num_epochs):
             self.model.train()
             running_loss = 0.0
+            correct = 0
+            total = 0
             for inputs, labels in tqdm.tqdm(self.train_loader, desc=f"Train loop, Epoch {epoch + 1}"):
                 inputs, labels = inputs.to(self.device).float(), labels.to(self.device)
                 self.optimizer.zero_grad()
@@ -56,15 +73,19 @@ class Trainer:
                 self.optimizer.step()
                 running_loss += loss.item()
 
-            # Print average training loss for the epoch
+                _, predicted = torch.max(outputs, 1)
+                correct += (predicted == labels).sum().item()
+                total += labels.size(0)
+
+            accuracy = correct / total
             training_loss = running_loss / len(self.train_loader)
-            print(f"Epoch {epoch+1}/{self.params.training_params.num_epochs}, Training Loss: {training_loss}")
-            wandb.log({"Train/loss": training_loss, "Learning rate": self.get_lr()})
+            print(f"Epoch {epoch+1}/{self.params.training_params.num_epochs}, Training Accuracy: {accuracy}, Training Loss: {training_loss}")
+            if self.wandb_logging:
+                wandb.log({"Train/loss": training_loss, "Train/accuracy": accuracy, "Learning rate": self.get_lr()})
 
             if self.scheduler is not None:
                 self.scheduler.step()
 
-            # Evaluate the model on the validation set
             self.evaluate()
 
     def evaluate(self):
@@ -79,14 +100,43 @@ class Trainer:
                 val_loss += self.criterion(outputs, labels).item()
 
                 _, predicted = torch.max(outputs, 1)
-                total += labels.size(0)
                 correct += (predicted == labels).sum().item()
+
+                total += labels.size(0)
 
         accuracy = correct / total
         val_loss = val_loss / len(self.val_loader)
-        wandb.log({"Validation/loss": val_loss, "Validation/accuracy": accuracy})
+        if self.wandb_logging:
+            wandb.log({"Validation/loss": val_loss, "Validation/accuracy": accuracy})
         print(f"Validation Accuracy: {accuracy}, Validation loss: {val_loss}")
 
     def get_lr(self):
         for param_group in self.optimizer.param_groups:
             return param_group['lr']
+    
+    def test(self, test_loader):
+        self.model.eval()
+        correct = 0
+        total = 0
+        test_loss = 0.0
+        y_preds = []
+        y_true = []
+        with torch.no_grad():
+            for inputs, labels in tqdm.tqdm(test_loader, desc="Validation loop"):
+                inputs, labels = inputs.to(self.device).float(), labels.to(self.device)
+                outputs = self.model(inputs)
+                val_loss += self.criterion(outputs, labels).item()
+
+                _, predicted = torch.max(outputs, 1)
+                y_preds.extend(list(predicted.cpu().numpy()))
+                y_true.extend(list(labels.cpu().numpy()))
+
+                correct += (predicted == labels).sum().item()
+                total += labels.size(0)
+
+        accuracy = correct / total
+        val_loss = val_loss / len(test_loader)
+        if self.wandb_logging:
+            wandb.log({"Test/loss": val_loss, "Test/accuracy": accuracy})
+        print(f"Test Accuracy: {accuracy}, Test loss: {val_loss}")
+        return y_preds, y_true

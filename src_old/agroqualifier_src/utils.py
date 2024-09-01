@@ -3,7 +3,7 @@ import torch
 from torch.optim.lr_scheduler import StepLR
 
 from agroqualifier.models import SimpleCNN
-from agroqualifier.dataset import MandarinDataset
+from agroqualifier_src.dataset import MandarinDataset
 
 models_dict = {"SimpleCNN": SimpleCNN}
 

@@ -1,0 +1,20 @@
+training:
+  seed: 42
+  batch_size: 5
+  num_workers: 4
+  learning_rate: 0.001
+  num_epochs: 1
+
+dataset:
+  dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/Datasets/Mandarins segmentation.v2i.coco"
+  size: 1024
+  horizontal_flip: 0.5
+  
+model:
+ name: "MaskRCNN"
+ num_classes: 2 # background and mandarin
+ backbone: "resnet50"
+
+logger:
+  name: "wandb"
+  run_name: "default"
