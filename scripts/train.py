@@ -24,6 +24,12 @@ def _parse_args() -> argparse.Namespace:
         help="Path to the configuration file.",
         required=True,
     )
+    argument_parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Enable debug mode.",
+        default=False,
+    )
     return argument_parser.parse_args()
 
 
@@ -42,9 +48,19 @@ def load_config(config_path):
     return config
 
 
-def train(config, confif_dict, config_name):
+def train(config, confif_dict, config_name, debug=False):
     L.seed_everything(seed=config.training.seed, workers=True)
     L.pytorch.seed_everything(config.training.seed, workers=True)
+
+    if debug:
+        config.training.num_epochs = 1
+        config.training.batch_size = 2
+        config.training.num_workers = 0
+        limit_train_batches = 2
+        limit_val_batches = 2
+    else:
+        limit_train_batches = None
+        limit_val_batches = None
 
     train_dataset = build_dataset(config, Split.train.value)
     valid_dataset = build_dataset(config, Split.valid.value)
@@ -57,7 +73,7 @@ def train(config, confif_dict, config_name):
     )
     valid_loader = torch.utils.data.DataLoader(
         valid_dataset,
-        batch_size=1,
+        batch_size=config.training.batch_size,
         shuffle=False,
         collate_fn=collate_fn,
     )
@@ -90,8 +106,8 @@ def train(config, confif_dict, config_name):
         log_every_n_steps=log_every_n_steps,
         callbacks=callbacks,
         logger=logger,
-        limit_train_batches=2,
-        limit_val_batches=2,
+        limit_train_batches=limit_train_batches,
+        limit_val_batches=limit_val_batches,
     )
     trainer.fit(
         model=model,
@@ -147,4 +163,4 @@ if __name__ == "__main__":
     flatten_config = flatten_dict(config_dict)
     config = dict_to_namespace(config_dict)
 
-    train(config, flatten_config, args.config.split("/")[-1])
+    train(config, flatten_config, args.config.split("/")[-1], args.debug)
