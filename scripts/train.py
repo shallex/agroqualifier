@@ -58,9 +58,11 @@ def train(config, confif_dict, config_name, debug=False):
         config.training.num_workers = 0
         limit_train_batches = 2
         limit_val_batches = 2
+        log_every_n_steps = 1
     else:
         limit_train_batches = None
         limit_val_batches = None
+        log_every_n_steps = 1
 
     train_dataset = build_dataset(config, Split.train.value)
     valid_dataset = build_dataset(config, Split.valid.value)
@@ -77,7 +79,6 @@ def train(config, confif_dict, config_name, debug=False):
         shuffle=False,
         collate_fn=collate_fn,
     )
-    log_every_n_steps = len(train_loader) // 10
 
     base_model = build_model(config)
     model = MandarinSegmentationModel(

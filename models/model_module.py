@@ -17,11 +17,11 @@ class MandarinSegmentationModel(L.LightningModule):
         images, targets = batch
         output = self.model(images, targets)
         output = {f"train/{k}": v for k, v in output.items()}
-        self.log_dict(output)
 
         loss = sum(loss for loss in output.values())
 
         self.log("train/sum_loss", loss, prog_bar=True)
+        self.log_dict(output)
         return loss
 
     def draw_mask(self, image, pred, threshold=0.7):
@@ -39,9 +39,13 @@ class MandarinSegmentationModel(L.LightningModule):
         if batch_idx == 0:
             images_to_show = []
             caption = []
-            for i in range(len(images)):
-                image = torch.clip(images[i].cpu() * 255, 0, 255)
-                
+            for i in range(min(5, len(images))):
+                mean=[0.485, 0.456, 0.406]
+                std=[0.229, 0.224, 0.225]
+                image = images[i].cpu()
+                image = image * std + mean
+                image = torch.clip(image * 255, 0, 255)
+
                 output_image = self.draw_mask(image, preds[i])
                 images_to_show.append(output_image)
                 caption.append("Predicted")
