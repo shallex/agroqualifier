@@ -40,10 +40,11 @@ class MandarinSegmentationModel(L.LightningModule):
             images_to_show = []
             caption = []
             for i in range(min(5, len(images))):
-                mean=[0.485, 0.456, 0.406]
-                std=[0.229, 0.224, 0.225]
+                mean = [0.485, 0.456, 0.406]
+                std = [0.229, 0.224, 0.225]
                 image = images[i].cpu()
-                image = image * std + mean
+                for t, m, s in zip(image, mean, std):
+                    t.mul_(s).add_(m)
                 image = torch.clip(image * 255, 0, 255)
 
                 output_image = self.draw_mask(image, preds[i])
