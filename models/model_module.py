@@ -4,6 +4,7 @@ from torch import optim, nn, utils, Tensor
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from torchvision.utils import draw_bounding_boxes, draw_segmentation_masks
 
+from data.constants import MEAN, STD
 
 class MandarinSegmentationModel(L.LightningModule):
     def __init__(self, model, config):
@@ -25,8 +26,8 @@ class MandarinSegmentationModel(L.LightningModule):
         self.log_dict(output)
         return loss
 
-    def draw_mask(self, image, pred, threshold=0.7):
-        masks = (pred["masks"] > threshold)
+    def draw_mask(self, image, pred):
+        masks = (pred["masks"] > self.threshold)
         output_image = draw_segmentation_masks(image, masks, alpha=0.5, colors="blue")
         return output_image
 
@@ -41,10 +42,8 @@ class MandarinSegmentationModel(L.LightningModule):
             images_to_show = []
             caption = []
             for i in range(min(5, len(images))):
-                mean = [0.485, 0.456, 0.406]
-                std = [0.229, 0.224, 0.225]
                 image = images[i].cpu()
-                for t, m, s in zip(image, mean, std):
+                for t, m, s in zip(image, MEAN, STD):
                     t.mul_(s).add_(m)
                 image = torch.clip(image * 255, 0, 255)
 
