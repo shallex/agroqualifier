@@ -17,11 +17,11 @@ class MandarinSegmentationModel(L.LightningModule):
         images, targets = batch
         output = self.model(images, targets)
         output = {f"train/{k}": v for k, v in output.items()}
+        self.log_dict(output)
 
         loss = sum(loss for loss in output.values())
 
         self.log("train/sum_loss", loss, prog_bar=True)
-        self.log_dict(output)
         return loss
 
     def draw_mask(self, image, pred, threshold=0.7):
