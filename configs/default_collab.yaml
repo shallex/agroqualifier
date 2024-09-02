@@ -6,7 +6,7 @@ training:
   num_epochs: 1
 
 dataset:
-  dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/Datasets/Mandarins segmentation.v2i.coco"
+  dataset_path: "/content/drive/MyDrive/AgroQualifier/Mandarins segmentation.v2i.coco"
   size: 1024
   horizontal_flip: 0.5
   

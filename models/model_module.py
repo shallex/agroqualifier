@@ -12,19 +12,20 @@ class MandarinSegmentationModel(L.LightningModule):
         self.config = config
         self.map_metric = MeanAveragePrecision(iou_type=["segm"])
 
-        
 
     def training_step(self, batch, batch_idx):
         images, targets = batch
         output = self.model(images, targets)
+        output = {f"train/{k}": v for k, v in output.items()}
 
         loss = sum(loss for loss in output.values())
-        
-        self.log("train/loss", loss, prog_bar=True)
+
+        self.log("train/sum_loss", loss, prog_bar=True)
+        self.log_dict(output)
         return loss
 
     def draw_mask(self, image, pred, threshold=0.7):
-        masks = (pred["masks"] > threshold) #.squeeze(1)
+        masks = (pred["masks"] > threshold)
         output_image = draw_segmentation_masks(image, masks, alpha=0.5, colors="blue")
         return output_image
 
