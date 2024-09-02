@@ -12,6 +12,8 @@ from models.model_module import MandarinSegmentationModel
 from models.utils import build_model
 from utils.callbacks import ValidationMetricCallback
 from lightning.pytorch.loggers import WandbLogger
+from lightning.pytorch.callbacks import LearningRateMonitor
+
 
 def _parse_args() -> argparse.Namespace:
     argument_parser = argparse.ArgumentParser(
@@ -85,8 +87,9 @@ def train(config, confif_dict, config_name, debug=False):
         base_model,
         config,
     )
-    
+
     callbacks = [
+        LearningRateMonitor(logging_interval="epoch"),
         ModelSummary(max_depth=3),
         ValidationMetricCallback(),
     ]

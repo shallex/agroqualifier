@@ -3,6 +3,7 @@ import torch
 from torch import optim, nn, utils, Tensor
 from torchmetrics.detection.mean_ap import MeanAveragePrecision
 from torchvision.utils import draw_bounding_boxes, draw_segmentation_masks
+from torch.optim.lr_scheduler import ExponentialLR
 
 from data.constants import MEAN, STD
 
@@ -63,4 +64,11 @@ class MandarinSegmentationModel(L.LightningModule):
 
     def configure_optimizers(self):
         optimizer = optim.Adam(self.parameters(), lr=self.config.training.learning_rate)
-        return optimizer
+        return {
+            "optimizer": optimizer,
+            "lr_scheduler": {
+                "scheduler": ExponentialLR(optimizer, gamma=0.7),
+                "interval": "epoch",
+                "frequency": 1,
+            },
+        }
