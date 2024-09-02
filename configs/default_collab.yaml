@@ -14,6 +14,7 @@ model:
  name: "MaskRCNN"
  num_classes: 2 # background and mandarin
  backbone: "resnet50"
+ threshold: 0.6
 
 logger:
   name: "wandb"

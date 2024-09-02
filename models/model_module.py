@@ -10,6 +10,7 @@ class MandarinSegmentationModel(L.LightningModule):
         super().__init__()
         self.model = model
         self.config = config
+        self.threshold = config.model.threshold
         self.map_metric = MeanAveragePrecision(iou_type=["segm"])
 
 
@@ -55,7 +56,7 @@ class MandarinSegmentationModel(L.LightningModule):
                 images_to_show.append(output_image)
                 caption.append("Ground Truth")
 
-            self.logger.log_image(key="validation batch", images=images_to_show, caption=caption)
+            self.logger.log_image(key=f"validation batch, thr={self.threshold}", images=images_to_show, caption=caption)
 
         self.map_metric.update(preds, targets)
     
