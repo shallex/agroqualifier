@@ -8,7 +8,7 @@ training:
 
 dataset:
   dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/Datasets/Mandarins segmentation.v2i.coco"
-  size: 1024
+  size: 512
   horizontal_flip: 0.5
   
 model:
