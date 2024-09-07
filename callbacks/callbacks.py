@@ -8,6 +8,7 @@ class ValidationMetricCallback(L.Callback):
     
     def on_validation_epoch_end(self, trainer: L.Trainer, pl_module) -> None:
         result = pl_module.map_metric.compute()
+        result.pop("map_per_class")
+        result.pop("mar_100_per_class")
         result = {f"val/{k}": v for k, v in result.items()}
-        print(result)
-        # pl_module.log_dict(result)
+        pl_module.log_dict(result)

@@ -29,6 +29,8 @@ class MandarinSegmentationModel(L.LightningModule):
 
     def draw_mask(self, image, pred):
         masks = (pred["masks"] > self.threshold)
+        if masks.ndim == 4:
+            masks = masks.squeeze(1)
         output_image = draw_segmentation_masks(image, masks, alpha=0.5, colors="blue")
         return output_image
 
@@ -37,7 +39,6 @@ class MandarinSegmentationModel(L.LightningModule):
         
         images, targets = batch
         preds = self.model(images, targets)
-        preds = [{k: (v.squeeze(1).to(torch.uint8) if k == "masks" else v) for k, v in p.items()} for p in preds]
 
         if batch_idx == 0:
             images_to_show = []
@@ -46,11 +47,12 @@ class MandarinSegmentationModel(L.LightningModule):
                 image = images[i].cpu()
                 for t, m, s in zip(image, MEAN, STD):
                     t.mul_(s).add_(m)
-                image = torch.clip(image * 255, 0, 255)
+                image = torch.clip(image * 255, 0, 255).to(torch.uint8)
 
                 output_image = self.draw_mask(image, preds[i])
                 images_to_show.append(output_image)
-                caption.append("Predicted")
+                num_preds = preds[i]["labels"].shape[0]
+                caption.append(f"Predicted, num predicted objects {num_preds}")
 
                 output_image = self.draw_mask(image, targets[i])
                 images_to_show.append(output_image)
@@ -58,8 +60,10 @@ class MandarinSegmentationModel(L.LightningModule):
 
             self.logger.log_image(key=f"validation batch, thr={self.threshold}", images=images_to_show, caption=caption)
 
+        preds = [{k: (v.squeeze(1).to(torch.bool) if k == "masks" else v) for k, v in p.items()} for p in preds]
+        targets = [{k: (v.to(torch.bool) if k == "masks" else v) for k, v in p.items()} for p in targets]
         self.map_metric.update(preds, targets)
-    
+
         return 0
 
     def configure_optimizers(self):
@@ -67,7 +71,7 @@ class MandarinSegmentationModel(L.LightningModule):
         return {
             "optimizer": optimizer,
             "lr_scheduler": {
-                "scheduler": ExponentialLR(optimizer, gamma=0.7),
+                "scheduler": ExponentialLR(optimizer, self.config.training.gamma),
                 "interval": "epoch",
                 "frequency": 1,
             },

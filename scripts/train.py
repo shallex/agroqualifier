@@ -1,18 +1,19 @@
 import argparse
-import yaml
 import datetime
+import git
 
 import lightning as L
 from lightning.pytorch.callbacks import ModelSummary
 import torch
+from lightning.pytorch.loggers import WandbLogger
+from lightning.pytorch.callbacks import LearningRateMonitor
 
+from scripts.utils import load_config
+from callbacks.callbacks import ValidationMetricCallback
 from data.utils import build_dataset, collate_fn
 from data.constants import Split
 from models.model_module import MandarinSegmentationModel
 from models.utils import build_model
-from utils.callbacks import ValidationMetricCallback
-from lightning.pytorch.loggers import WandbLogger
-from lightning.pytorch.callbacks import LearningRateMonitor
 
 
 def _parse_args() -> argparse.Namespace:
@@ -27,6 +28,12 @@ def _parse_args() -> argparse.Namespace:
         required=True,
     )
     argument_parser.add_argument(
+        "--dataset_path",
+        type=str,
+        required=False,
+        help="Path to the dataset.",
+    )
+    argument_parser.add_argument(
         "--debug",
         action="store_true",
         help="Enable debug mode.",
@@ -35,28 +42,13 @@ def _parse_args() -> argparse.Namespace:
     return argument_parser.parse_args()
 
 
-def load_config(config_path):
-    """
-    Load configuration from a YAML file.
-    
-    Args:
-        config_path (str): Path to the config.yaml file.
-    
-    Returns:
-        dict: Configuration dictionary.
-    """
-    with open(config_path, 'r') as file:
-        config = yaml.safe_load(file)
-    return config
-
-
 def train(config, confif_dict, config_name, debug=False):
     L.seed_everything(seed=config.training.seed, workers=True)
     L.pytorch.seed_everything(config.training.seed, workers=True)
 
     if debug:
         config.training.num_epochs = 1
-        config.training.batch_size = 2
+        config.training.batch_size = min(2, config.training.batch_size)
         config.training.num_workers = 0
         limit_train_batches = 2
         limit_val_batches = 2
@@ -161,9 +153,22 @@ def flatten_dict(d, parent_key='', sep='_'):
     return dict(items)
 
 
+def get_git_commit_hash():
+    try:
+        repo = git.Repo(path="./agroqualifier")
+        sha = repo.head.object.hexsha
+    except:
+        sha = "unknown"
+    return sha[:8]
+
+
 if __name__ == "__main__":
     args = _parse_args()
     config_dict = load_config(args.config)
+    if args.dataset_path is not None:
+        config_dict["dataset"]["dataset_path"] = args.dataset_path
+    git_commit_hash = get_git_commit_hash()
+    config_dict["logger"]["run_name"] += f"_commit-{git_commit_hash}"
     flatten_config = flatten_dict(config_dict)
     config = dict_to_namespace(config_dict)
 

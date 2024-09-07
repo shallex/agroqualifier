@@ -4,6 +4,7 @@ training:
   num_workers: 4
   learning_rate: 0.0001
   num_epochs: 20
+  gamma: 0.95
 
 dataset:
   dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/Datasets/Mandarins segmentation.v2i.coco"
