@@ -1,7 +1,12 @@
 parent_config: ./agroqualifier/configs/default.yaml
 
 dataset:
-  augmentation: True
+  augmentation:
+    RandomHorizontalFlip: True
+    RandomVerticalFlip: True
+    RandomRotation: True
+    RandomResizedCrop: True
+    ColorJitter: False
 
 logger:
   run_name: "default_augmentation"

@@ -1,4 +1,5 @@
 import enum
+from torchvision.transforms import v2 as T
 
 ANNOTATION_FILENAME = "_annotations.coco.json"
 

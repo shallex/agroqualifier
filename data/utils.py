@@ -56,17 +56,25 @@ def get_dataframe(dataset_path: Path, split: str):
     return df
 
 
+
 def get_transform(train, config):
     transforms = []
 
     transforms.append(T.Resize((config.dataset.size, config.dataset.size)))
     if train:
-        transforms.append(T.RandomHorizontalFlip(config.dataset.horizontal_flip))
         if config.dataset.augmentation:
-            transforms.append(T.RandomVerticalFlip(config.dataset.horizontal_flip))
-            transforms.append(T.RandomRotation(degrees=90))
-            transforms.append(T.RandomResizedCrop(size=config.dataset.size, scale=(0.8, 1.0)))
-            transforms.append(T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1)),
+            augmentation_transforms = {
+                'RandomHorizontalFlip': T.RandomHorizontalFlip(config.dataset.horizontal_flip),
+                'RandomVerticalFlip': T.RandomVerticalFlip(config.dataset.horizontal_flip),
+                'RandomRotation': T.RandomRotation(degrees=90),
+                'RandomResizedCrop': T.RandomResizedCrop(size=config.dataset.size, scale=(0.8, 1.0)),
+                'ColorJitter': T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+            }
+
+            transforms += [
+                aug_transform for aug_name, aug_transform in augmentation_transforms.items()
+                if getattr(config.dataset.augmentation, aug_name)
+            ]
 
     transforms.append(T.ToDtype(torch.float, scale=True))
     transforms.append(T.ToPureTensor())

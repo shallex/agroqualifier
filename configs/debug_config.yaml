@@ -9,7 +9,8 @@ training:
 dataset:
   dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/agroqualifier/data/debug_dataset"
   size: 256
-  horizontal_flip: 0
+  horizontal_flip: 0.5
+  augmentation: True
   
 model:
  name: "MaskRCNN"

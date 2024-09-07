@@ -34,6 +34,13 @@ def _parse_args() -> argparse.Namespace:
         help="Path to the dataset.",
     )
     argument_parser.add_argument(
+        "--save_dir",
+        type=str,
+        required=False,
+        default=".",
+        help="Path to the directory where to save the model.",
+    )
+    argument_parser.add_argument(
         "--debug",
         action="store_true",
         help="Enable debug mode.",
@@ -89,7 +96,8 @@ def train(config, confif_dict, config_name, debug=False):
     if config.logger.name == "wandb":
         logger = WandbLogger(
             project="AQ-VkusVill",
-            name=f'Name: {config.logger.run_name}. Config: {config_name}. {datetime.datetime.now().strftime("%d %B %Y, %H:%M")}'
+            name=f'Name: {config.logger.run_name}. Config: {config_name}. {datetime.datetime.now().strftime("%d %B %Y, %H:%M")}',
+            save_dir=config.save_dir,
         )
         logger.experiment.config.update(confif_dict)
     else:
@@ -169,6 +177,7 @@ if __name__ == "__main__":
         config_dict["dataset"]["dataset_path"] = args.dataset_path
     git_commit_hash = get_git_commit_hash()
     config_dict["logger"]["run_name"] += f"_commit-{git_commit_hash}"
+    config_dict["save_dir"] = args.save_dir
     flatten_config = flatten_dict(config_dict)
     config = dict_to_namespace(config_dict)
 
