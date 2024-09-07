@@ -1,0 +1,7 @@
+parent_config: ./agroqualifier/configs/default.yaml
+
+dataset:
+  augmentation: True
+
+logger:
+  run_name: "default_augmentation"
