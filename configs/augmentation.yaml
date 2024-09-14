@@ -12,7 +12,7 @@ dataset:
     RandomRotation: False
     RandomResizedCrop: False
     ColorJitter: False
-    Pad: False
+    Pad: True
 
 logger:
   run_name: "default_augmentation"
