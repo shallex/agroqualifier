@@ -66,7 +66,7 @@ def get_transform(train, config):
             augmentation_transforms = {
                 'RandomHorizontalFlip': T.RandomHorizontalFlip(config.dataset.horizontal_flip),
                 'RandomVerticalFlip': T.RandomVerticalFlip(config.dataset.horizontal_flip),
-                'RandomRotation': T.RandomRotation(degrees=90),
+                'RandomRotation': T.RandomRotation(degrees=10),
                 'RandomResizedCrop': T.RandomResizedCrop(size=config.dataset.size, scale=(0.8, 1.0)),
                 'ColorJitter': T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
             }
