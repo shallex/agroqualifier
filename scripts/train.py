@@ -6,7 +6,7 @@ import lightning as L
 from lightning.pytorch.callbacks import ModelSummary
 import torch
 from lightning.pytorch.loggers import WandbLogger
-from lightning.pytorch.callbacks import LearningRateMonitor
+from lightning.pytorch.callbacks import LearningRateMonitor, TQDMProgressBar
 
 from scripts.utils import load_config
 from callbacks.callbacks import ValidationMetricCallback
@@ -14,6 +14,7 @@ from data.utils import build_dataset, collate_fn
 from data.constants import Split
 from models.model_module import MandarinSegmentationModel
 from models.utils import build_model
+
 
 
 def _parse_args() -> argparse.Namespace:
@@ -91,6 +92,7 @@ def train(config, confif_dict, config_name, debug=False):
         LearningRateMonitor(logging_interval="epoch"),
         ModelSummary(max_depth=3),
         ValidationMetricCallback(),
+        TQDMProgressBar(refresh_rate=10)
     ]
     
     if config.logger.name == "wandb":
