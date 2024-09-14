@@ -19,7 +19,7 @@ class MandarinSegmentationDataset(Dataset):
         self._split = split
         self._transforms = transforms
         if self._config.dataset.augmentation.Pad:
-            self._pad_sizes = list(range(config.dataset.size // 8, config.dataset.size // 6, 10))
+            self._pad_sizes = list(range(config.dataset.size // 8, config.dataset.size * 2, 50))
 
 
     def create_polygon_mask(self, image_size, vertices):
@@ -73,13 +73,14 @@ class MandarinSegmentationDataset(Dataset):
         target["area"] = torch.tensor(self._dataframe.loc[index, "area"], dtype=torch.float32)
         target["iscrowd"] = iscrowd
 
-        if self._transforms is not None:
-            img, target = self._transforms(img, target)
-        
         if self._split == "train" and self._config.dataset.augmentation.Pad and num_objs == 1 and random.random() < 0.5:
             pad_size = random.choice(self._pad_sizes)
             img, target = T.Pad(pad_size)(img, target)
-            img, target = T.Resize(self._config.dataset.size)(img, target)
+            # img, target = T.Resize(self._config.dataset.size)(img, target)
+
+        if self._transforms is not None:
+            img, target = self._transforms(img, target)
+
         return img, target
 
     def __len__(self):
