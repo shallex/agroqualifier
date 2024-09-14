@@ -92,7 +92,7 @@ def train(config, confif_dict, config_name, debug=False):
         LearningRateMonitor(logging_interval="epoch"),
         ModelSummary(max_depth=3),
         ValidationMetricCallback(),
-        TQDMProgressBar(refresh_rate=10)
+        TQDMProgressBar(refresh_rate=3)
     ]
     
     if config.logger.name == "wandb":

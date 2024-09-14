@@ -1,16 +1,11 @@
 parent_config: ./agroqualifier/configs/default.yaml
 
-training:
-  learning_rate: 0.001
-  num_epochs: 20
-  gamma: 0.5
-
 dataset:
   augmentation:
     RandomHorizontalFlip: True
     RandomVerticalFlip: False
     RandomRotation: True
-    RandomResizedCrop: True
+    RandomResizedCrop: False
     ColorJitter: False
 
 logger:
