@@ -79,6 +79,7 @@ class MandarinSegmentationDataset(Dataset):
         if self._split == "train" and self._config.dataset.augmentation.Pad and num_objs == 1 and random.random() < 0.5:
             pad_size = random.choice(self._pad_sizes)
             img, target = T.Pad(pad_size)(img, target)
+            img, target = T.Resize(self._config.dataset.size)(img, target)
         return img, target
 
     def __len__(self):
