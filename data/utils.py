@@ -56,7 +56,6 @@ def get_dataframe(dataset_path: Path, split: str):
     return df
 
 
-
 def get_transform(train, config):
     transforms = []
 
@@ -69,6 +68,7 @@ def get_transform(train, config):
                 'RandomRotation': T.RandomRotation(degrees=10),
                 'RandomResizedCrop': T.RandomResizedCrop(size=config.dataset.size, scale=(0.8, 1.0)),
                 'ColorJitter': T.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2, hue=0.1),
+                "Pad": 
             }
 
             transforms += [
@@ -96,7 +96,7 @@ def build_dataset(config, split: str = Split.train.value):
 
     transform = get_transform(split == Split.train.value, config)
 
-    dataset = MandarinSegmentationDataset(dataframe, split, transform)
+    dataset = MandarinSegmentationDataset(config, dataframe, split, transform)
     return dataset
 
 

@@ -1,4 +1,5 @@
 from typing import Tuple, List, Dict
+import random
 
 from PIL import Image, ImageDraw
 import torch
@@ -7,14 +8,19 @@ from torchvision.io import read_image
 from torchvision import tv_tensors
 import torchvision.transforms.v2  as transforms
 from torchvision.transforms.v2 import functional as F
+from torchvision.transforms import v2 as T
 
 
 class MandarinSegmentationDataset(Dataset):
-    def __init__(self, dataframe, split, transforms) -> None:
+    def __init__(self, config, dataframe, split, transforms) -> None:
         super().__init__()
+        self._config = config
         self._dataframe = dataframe
         self._split = split
         self._transforms = transforms
+        if self._config.dataset.augmentation.Pad:
+            self.pad_sizes = list(range(config.dataset.size // 8, config.dataset.size // 6, 10))
+            self.pad = ()
 
 
     def create_polygon_mask(self, image_size, vertices):
@@ -70,7 +76,10 @@ class MandarinSegmentationDataset(Dataset):
 
         if self._transforms is not None:
             img, target = self._transforms(img, target)
-
+        
+        if self.split == "train" and self._config.dataset.augmentation.Pad and num_objs == 1 and random.random() < 0.5:
+            pad_size = random.choice(self.pad_sizes)
+            img, target = T.Pad(pad_size)(img, target)
         return img, target
 
     def __len__(self):

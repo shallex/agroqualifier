@@ -19,6 +19,7 @@ dataset:
     RandomRotation: False
     RandomResizedCrop: False
     ColorJitter: False
+    Pad: False
   
 model:
  name: "MaskRCNN"

@@ -9,9 +9,10 @@ dataset:
   augmentation:
     RandomHorizontalFlip: True
     RandomVerticalFlip: False
-    RandomRotation: True
+    RandomRotation: False
     RandomResizedCrop: False
     ColorJitter: False
+    Pad: False
 
 logger:
   run_name: "default_augmentation"
