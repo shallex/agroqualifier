@@ -3,7 +3,7 @@ training:
   batch_size: 16
   num_workers: 1
   learning_rate: 0.0001
-  num_epochs: 20
+  num_epochs: 10
   gamma: 0.95
   weight_decay: 0.005
 
