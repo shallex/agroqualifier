@@ -1,5 +1,10 @@
 parent_config: ./agroqualifier/configs/default.yaml
 
+training:
+  seed: 42
+  learning_rate: 0.0001
+  num_epochs: 20
+
 dataset:
   augmentation:
     RandomHorizontalFlip: True
