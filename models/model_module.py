@@ -84,12 +84,12 @@ class MandarinSegmentationModel(L.LightningModule):
         return 0
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.parameters(), lr=self.config.training.learning_rate, weight_decay=self.config.training.weight_decay)
+        optimizer = optim.AdamW(self.parameters(), lr=self.config.training.learning_rate, weight_decay=self.config.training.weight_decay)
         return {
             "optimizer": optimizer,
             "lr_scheduler": {
-                "scheduler": ExponentialLR(optimizer, self.config.training.gamma),
+                "scheduler": ExponentialLR(optimizer, self.config.training.lr_scheduler.gamma),
                 "interval": "epoch",
-                "frequency": 1,
+                "frequency": self.config.training.lr_scheduler.frequency,
             },
         }

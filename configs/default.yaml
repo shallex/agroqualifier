@@ -1,11 +1,13 @@
 training:
   seed: 42
-  batch_size: 16
+  batch_size: 4
   num_workers: 1
   learning_rate: 0.0001
   num_epochs: 10
-  gamma: 0.95
-  weight_decay: 0.005
+  weight_decay: 0.0001
+  lr_scheduler:
+    gamma: 0.1
+    frequency: 4
 
 dataset:
   dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/Datasets/Mandarins segmentation.v2i.coco"
