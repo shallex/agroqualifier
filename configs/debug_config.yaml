@@ -1,22 +1,15 @@
+parent_config: ./agroqualifier/configs/default.yaml
+
 training:
-  seed: 42
   batch_size: 1
   num_workers: 0
   learning_rate: 0.0001
-  num_epochs: 50
-  gamma: 0.95
+  num_epochs: 5
 
 dataset:
   dataset_path: "/Users/a.sharshavin/Desktop/skoltech/AgroQaulifier/work/agroqualifier/data/debug_dataset"
   size: 256
   horizontal_flip: 0.5
-  augmentation: True
-  
-model:
- name: "MaskRCNN"
- num_classes: 2 # background and mandarin
- backbone: "resnet50"
- threshold: 0.6
 
 logger:
   name: "wandb"
