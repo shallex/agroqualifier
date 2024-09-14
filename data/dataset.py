@@ -19,8 +19,7 @@ class MandarinSegmentationDataset(Dataset):
         self._split = split
         self._transforms = transforms
         if self._config.dataset.augmentation.Pad:
-            self.pad_sizes = list(range(config.dataset.size // 8, config.dataset.size // 6, 10))
-            self.pad = ()
+            self._pad_sizes = list(range(config.dataset.size // 8, config.dataset.size // 6, 10))
 
 
     def create_polygon_mask(self, image_size, vertices):
@@ -77,8 +76,8 @@ class MandarinSegmentationDataset(Dataset):
         if self._transforms is not None:
             img, target = self._transforms(img, target)
         
-        if self.split == "train" and self._config.dataset.augmentation.Pad and num_objs == 1 and random.random() < 0.5:
-            pad_size = random.choice(self.pad_sizes)
+        if self._split == "train" and self._config.dataset.augmentation.Pad and num_objs == 1 and random.random() < 0.5:
+            pad_size = random.choice(self._pad_sizes)
             img, target = T.Pad(pad_size)(img, target)
         return img, target
 
